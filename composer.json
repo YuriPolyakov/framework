@@ -13,5 +13,9 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^6.5"
+  },
+  "scripts": {
+    "serve": "php -S localhost:8080 -t public",
+    "test": "phpunit --colors"
   }
 }
