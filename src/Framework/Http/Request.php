@@ -4,18 +4,22 @@ namespace Framework\Http;
 
 class Request
 {
-    public function getCookies(): array
+    private $queryParams;
+    private $parsedBody;
+
+    public function __construct(array $queryParams = [], $parsedBody = null)
     {
-        return $_COOKIE;
+        $this->queryParams = $queryParams;
+        $this->parsedBody  = $parsedBody;
     }
 
-    public function getQueryParrams()
+    public function getQueryParrams(): array
     {
-        return $_GET;
+        return $this->queryParams;
     }
 
     public function getParsedBody()
     {
-        return $_POST ?: null;
+        return $this->parsedBody;
     }
 }
