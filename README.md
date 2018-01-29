@@ -11,5 +11,8 @@ Usage
     ```bash
     composer serve
     ```
-
-    Then compile!
+ 2. Start test framework
+ 
+    ```bash
+    composer test
+    ```
