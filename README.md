@@ -9,7 +9,12 @@ do so, but that is not the aim.
 
 Usage
 ------------
+    ```bash
+    gem install bundler
+    bundle install
+    ```
 
-composer serve
+    Then compile!
 
-composer test
+    ```bash
+    bundle exec jekyll serve
