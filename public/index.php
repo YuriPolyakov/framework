@@ -36,9 +36,7 @@ $routes->get('cabinet', '/cabinet', function (ServerRequestInterface $request) u
     $pipeline->pipe(new \App\Http\Middleware\BasicAuthMiddleware($params['users']));
     $pipeline->pipe(new \App\Http\Action\CabinetAction());
 
-    return $pipeline($request, function () {
-        return new HtmlResponse('Undefined page', 404);
-    });
+    return $pipeline($request, new \App\Http\Middleware\NotFoundHadler());
 });
 
 $router   = new AuraRouterAdapter($aura);
@@ -56,7 +54,8 @@ try {
     $action   = $resolver->resolve($result->getHandler());
     $response = $action($request);
 } catch (RequestNotMatchedException $e) {
-    $response = new JsonResponse(['error' => 'undefined page'], 404);
+    $handler = new \App\Http\Middleware\NotFoundHadler();
+    $response = $handler($request);
 }
 
 // Postprocessing
