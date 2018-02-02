@@ -2,6 +2,8 @@
 
 use App\Http\Action\CabinetAction;
 use App\Http\Middleware\BasicAuthMiddleware;
+use App\Http\Middleware\CredentialsMiddleware;
+use App\Http\Middleware\ErrorHandlerMiddleware;
 use App\Http\Middleware\NotFoundHadler;
 use App\Http\Middleware\ProfilerMiddleware;
 use Framework\Http\Application;
@@ -9,6 +11,7 @@ use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Pipeline\Pipeline;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\SapiEmitter;
 use Framework\Http\Router\AuraRouterAdapter;
@@ -20,6 +23,7 @@ require 'vendor/autoload.php';
 
 // Initialization
 $params = [
+    'debug' => true,
     'users' => ['admin' => 'password']
 ];
 
@@ -42,13 +46,8 @@ $router   = new AuraRouterAdapter($aura);
 $resolver = new MiddlewareResolver();
 $app      = new Application($resolver, new NotFoundHadler());
 
-$app->pipe(function (ServerRequestInterface $request, callable $next) {
-    /** @var ResponseInterface $response */
-    $response = $next($request);
-
-    return $response->withHeader('X-Developer', 'Yuri');
-});
-
+$app->pipe(new ErrorHandlerMiddleware($params['debug']));
+$app->pipe(CredentialsMiddleware::class);
 $app->pipe(ProfilerMiddleware::class);
 
 // Running
@@ -63,9 +62,6 @@ try {
 }
 
 $response = $app->run($request);
-
-// Postprocessing
-$response =
 
 // Sending
 $emiter = new SapiEmitter();
