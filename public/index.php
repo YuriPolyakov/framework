@@ -29,14 +29,15 @@ $routes->get('blog', '/blog', \App\Http\Action\Blog\IndexAction::class);
 $routes->get('blog_show', '/blog/{id}', \App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
 
 $routes->get('cabinet', '/cabinet', function (ServerRequestInterface $request) use ($params) {
-    $profiler = new \App\Http\Middleware\ProfilerMiddleware();
-    $auth     = new \App\Http\Middleware\BasicAuthMiddleware($params['users']);
-    $cabinet  = new \App\Http\Action\CabinetAction();
 
-    return $profiler($request, function (ServerRequestInterface $request) use ($auth, $cabinet) {
-        return $auth($request, function (ServerRequestInterface $request) use ($cabinet) {
-            return $cabinet($request);
-        });
+    $pipeline = new \Framework\Http\Pipeline\Pipeline();
+
+    $pipeline->pipe(new \App\Http\Middleware\ProfilerMiddleware());
+    $pipeline->pipe(new \App\Http\Middleware\BasicAuthMiddleware($params['users']));
+    $pipeline->pipe(new \App\Http\Action\CabinetAction());
+
+    return $pipeline($request, function () {
+        return new HtmlResponse('Undefined page', 404);
     });
 });
 
