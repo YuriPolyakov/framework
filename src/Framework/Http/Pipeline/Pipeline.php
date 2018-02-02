@@ -37,7 +37,7 @@ class Pipeline
      *
      * @param callable $middleware
      */
-    public function pipe(callable $middleware): void
+    public function pipe($middleware): void
     {
         $this->queue->enqueue($middleware);
     }

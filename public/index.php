@@ -4,8 +4,11 @@ use App\Http\Action\CabinetAction;
 use App\Http\Middleware\BasicAuthMiddleware;
 use App\Http\Middleware\NotFoundHadler;
 use App\Http\Middleware\ProfilerMiddleware;
+use Framework\Http\Application;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Pipeline\Pipeline;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\SapiEmitter;
 use Framework\Http\Router\AuraRouterAdapter;
@@ -37,9 +40,16 @@ $routes->get('cabinet', '/cabinet', [
 
 $router   = new AuraRouterAdapter($aura);
 $resolver = new MiddlewareResolver();
-$pipeline = new Pipeline();
+$app      = new Application($resolver, new NotFoundHadler());
 
-$pipeline->pipe($resolver->resolve(ProfilerMiddleware::class));
+$app->pipe(function (ServerRequestInterface $request, callable $next) {
+    /** @var ResponseInterface $response */
+    $response = $next($request);
+
+    return $response->withHeader('X-Developer', 'Yuri');
+});
+
+$app->pipe(ProfilerMiddleware::class);
 
 // Running
 $request = ServerRequestFactory::fromGlobals();
@@ -48,14 +58,14 @@ try {
     foreach ($result->getAttributes() as $attribute => $value) {
         $request = $request->withAttribute($attribute, $value);
     }
-    $handler = $result->getHandler();
-    $pipeline->pipe($resolver->resolve($handler));
-} catch (RequestNotMatchedException $e) {}
+    $app->pipe($result->getHandler());
+} catch (RequestNotMatchedException $e) {
+}
 
-$response = $pipeline($request, new NotFoundHadler());
+$response = $app->run($request);
 
 // Postprocessing
-$response = $response->withHeader('X-Developer', 'Yuri');
+$response =
 
 // Sending
 $emiter = new SapiEmitter();
