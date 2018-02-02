@@ -1,19 +1,21 @@
 <?php
 
-use Framework\Http\ActionResolver;
-use Zend\Diactoros\Response\JsonResponse;
+use App\Http\Action\CabinetAction;
+use App\Http\Middleware\BasicAuthMiddleware;
+use App\Http\Middleware\NotFoundHadler;
+use App\Http\Middleware\ProfilerMiddleware;
+use Framework\Http\Pipeline\MiddlewareResolver;
+use Framework\Http\Pipeline\Pipeline;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\SapiEmitter;
 use Framework\Http\Router\AuraRouterAdapter;
 use \Framework\Http\Router\Exception\RequestNotMatchedException;
 use Zend\Diactoros\Response\HtmlResponse;
-use Psr\Http\Message\ServerRequestInterface;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
 // Initialization
-
 $params = [
     'users' => ['admin' => 'password']
 ];
@@ -27,36 +29,30 @@ $routes->get('about', '/about', function () {
 });
 $routes->get('blog', '/blog', \App\Http\Action\Blog\IndexAction::class);
 $routes->get('blog_show', '/blog/{id}', \App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
-
-$routes->get('cabinet', '/cabinet', function (ServerRequestInterface $request) use ($params) {
-
-    $pipeline = new \Framework\Http\Pipeline\Pipeline();
-
-    $pipeline->pipe(new \App\Http\Middleware\ProfilerMiddleware());
-    $pipeline->pipe(new \App\Http\Middleware\BasicAuthMiddleware($params['users']));
-    $pipeline->pipe(new \App\Http\Action\CabinetAction());
-
-    return $pipeline($request, new \App\Http\Middleware\NotFoundHadler());
-});
+$routes->get('cabinet', '/cabinet', [
+    ProfilerMiddleware::class,
+    new BasicAuthMiddleware($params['users']),
+    CabinetAction::class
+]);
 
 $router   = new AuraRouterAdapter($aura);
-$resolver = new ActionResolver();
+$resolver = new MiddlewareResolver();
+$pipeline = new Pipeline();
+
+$pipeline->pipe($resolver->resolve(ProfilerMiddleware::class));
 
 // Running
 $request = ServerRequestFactory::fromGlobals();
 try {
     $result = $router->match($request);
-
     foreach ($result->getAttributes() as $attribute => $value) {
         $request = $request->withAttribute($attribute, $value);
     }
+    $handler = $result->getHandler();
+    $pipeline->pipe($resolver->resolve($handler));
+} catch (RequestNotMatchedException $e) {}
 
-    $action   = $resolver->resolve($result->getHandler());
-    $response = $action($request);
-} catch (RequestNotMatchedException $e) {
-    $handler = new \App\Http\Middleware\NotFoundHadler();
-    $response = $handler($request);
-}
+$response = $pipeline($request, new NotFoundHadler());
 
 // Postprocessing
 $response = $response->withHeader('X-Developer', 'Yuri');
