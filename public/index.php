@@ -7,6 +7,8 @@ use App\Http\Middleware\ErrorHandlerMiddleware;
 use App\Http\Middleware\NotFoundHadler;
 use App\Http\Middleware\ProfilerMiddleware;
 use Framework\Http\Application;
+use Framework\Http\Middleware\DispatchMiddleware;
+use Framework\Http\Middleware\RouteMiddleware;
 use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Pipeline\Pipeline;
 use Psr\Http\Message\ResponseInterface;
@@ -49,18 +51,11 @@ $app      = new Application($resolver, new NotFoundHadler());
 $app->pipe(new ErrorHandlerMiddleware($params['debug']));
 $app->pipe(CredentialsMiddleware::class);
 $app->pipe(ProfilerMiddleware::class);
+$app->pipe(new RouteMiddleware($router));
+$app->pipe(new DispatchMiddleware($resolver));
 
 // Running
-$request = ServerRequestFactory::fromGlobals();
-try {
-    $result = $router->match($request);
-    foreach ($result->getAttributes() as $attribute => $value) {
-        $request = $request->withAttribute($attribute, $value);
-    }
-    $app->pipe($result->getHandler());
-} catch (RequestNotMatchedException $e) {
-}
-
+$request  = ServerRequestFactory::fromGlobals();
 $response = $app->run($request);
 
 // Sending
