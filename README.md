@@ -8,6 +8,7 @@ Use
 - Zend-diactors PHP package containing implementations of the accepted PSR-7 HTTP message interfaces 
 - Aura router
 - PSR-15 HTTP Server Middleware
+- Zend-stratigility Stratigility started as a port of Sencha Connect to PHP. It allows you to build applications out of middleware.
 - Phpunit
 
 Usage
