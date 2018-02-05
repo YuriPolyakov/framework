@@ -1,7 +1,14 @@
 PHP Framework
 ====================================
 
-Description
+My simple framework
+
+Use
+------------
+- Zend-diactors PHP package containing implementations of the accepted PSR-7 HTTP message interfaces 
+- Aura router
+- PSR-15 HTTP Server Middleware
+- Phpunit
 
 Usage
 ------------
