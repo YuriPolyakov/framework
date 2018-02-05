@@ -17,6 +17,14 @@ class RouteMiddleware
         $this->router = $router;
     }
 
+    /**
+     * Определение маршрута с заполнением реквеста
+     *
+     * @param ServerRequestInterface $request
+     * @param callable $next
+     *
+     * @return mixed
+     */
     public function __invoke(ServerRequestInterface $request, callable $next)
     {
         try {

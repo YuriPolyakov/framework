@@ -18,6 +18,13 @@ class AuraRouterAdapter implements Router
         $this->aura = $aura;
     }
 
+    /**
+     * Парсинг роута
+     *
+     * @param ServerRequestInterface $request
+     *
+     * @return Result
+     */
     public function match(ServerRequestInterface $request): Result
     {
         $matcher = $this->aura->getMatcher();
@@ -27,6 +34,14 @@ class AuraRouterAdapter implements Router
         throw new RequestNotMatchedException($request);
     }
 
+    /**
+     * Генерация роута
+     *
+     * @param $name
+     * @param array $params
+     *
+     * @return string
+     */
     public function generate($name, array $params): string
     {
         $generator = $this->aura->getGenerator();
@@ -37,6 +52,14 @@ class AuraRouterAdapter implements Router
         }
     }
 
+    /**
+     * Создание произвольного роута
+     *
+     * @param RouteData $data
+     *
+     * @throws \Aura\Router\Exception\ImmutableProperty
+     * @throws \Aura\Router\Exception\RouteAlreadyExists
+     */
     public function addRoute(RouteData $data): void
     {
         $route = new Route();

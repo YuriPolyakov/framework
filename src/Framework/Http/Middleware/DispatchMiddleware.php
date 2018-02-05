@@ -15,6 +15,14 @@ class DispatchMiddleware
         $this->resolver = $resolver;
     }
 
+    /**
+     * Запуск хендлера
+     *
+     * @param ServerRequestInterface $request
+     * @param callable $next
+     *
+     * @return mixed
+     */
     public function __invoke(ServerRequestInterface $request, callable $next)
     {
         /** @var Result $result */
