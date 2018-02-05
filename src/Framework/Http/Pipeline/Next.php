@@ -9,11 +9,13 @@ class Next
 {
     private $default;
     private $queue;
+    private $response;
 
-    public function __construct(\SplQueue $queue, callable $default)
+    public function __construct(\SplQueue $queue, ResponseInterface $response, callable $default)
     {
-        $this->default = $default;
-        $this->queue   = $queue;
+        $this->default  = $default;
+        $this->queue    = $queue;
+        $this->response = $response;
     }
 
     /**
@@ -32,7 +34,7 @@ class Next
 
         $current = $this->queue->dequeue();
 
-        return $current($request, function (ServerRequestInterface $request) {
+        return $current($request, $this->response, function (ServerRequestInterface $request) {
             return $this($request);
         });
     }

@@ -2,6 +2,8 @@
 
 namespace Framework\Http\Pipeline;
 
+use Interop\Http\Server\MiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class MiddlewareResolver
@@ -13,14 +15,42 @@ class MiddlewareResolver
         }
 
         if (\is_string($handler)) {
-            return function (ServerRequestInterface $request, callable $next) use ($handler) {
-                $object = new $handler();
+            return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($handler
+            ) {
+                $middleware = $this->resolve(new $handler());
 
-                return $object($request, $next);
+                return $middleware($request, $response, $next);
             };
         }
 
-        return $handler;
+        if ($handler instanceof MiddlewareInterface) {
+            return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($handler
+            ) {
+                return $handler->process($request, new InteropHandlerWrapper($next));
+            };
+        }
+
+        if (\is_object($handler)) {
+            $reflection = new \ReflectionObject($handler);
+
+            if ($reflection->hasMethod('__invoke')) {
+                $method     = $reflection->getMethod('__invoke');
+                $parameters = $method->getParameters();
+
+                if (\count($parameters) === 2 && $parameters[1]->isCallable()) {
+                    // TODO обязательный 2 параметр. Не используется
+                    return function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use (
+                        $handler
+                    ) {
+                        return $handler($request, $next);
+                    };
+                }
+
+                return $handler;
+            }
+        }
+
+        throw new UnknownMiddlewareTypeException($handler);
     }
 
     public function createPipe(array $handlers): Pipeline

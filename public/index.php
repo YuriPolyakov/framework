@@ -13,6 +13,7 @@ use Framework\Http\Pipeline\MiddlewareResolver;
 use Framework\Http\Pipeline\Pipeline;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\SapiEmitter;
@@ -64,7 +65,7 @@ $app->pipe(new DispatchMiddleware($resolver));
 
 // Running
 $request  = ServerRequestFactory::fromGlobals();
-$response = $app->run($request);
+$response = $app->run($request, new Response());
 
 // Sending
 $emiter = new SapiEmitter();

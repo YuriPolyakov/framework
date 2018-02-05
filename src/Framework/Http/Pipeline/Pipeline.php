@@ -21,13 +21,14 @@ class Pipeline
      * Запуск рекурсии
      *
      * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      * @param callable $next - Последний посредник
      *
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, callable $next): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {
-        $delegate = new Next(clone $this->queue, $next);
+        $delegate = new Next(clone $this->queue, $response, $next);
 
         return $delegate($request);
     }
