@@ -20,6 +20,14 @@ use Framework\Http\Router\AuraRouterAdapter;
 use \Framework\Http\Router\Exception\RequestNotMatchedException;
 use Zend\Diactoros\Response\HtmlResponse;
 
+function dd($value)
+{
+    echo '<pre>';
+    print_r($value);
+    echo '</pre>';
+    die;
+}
+
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
