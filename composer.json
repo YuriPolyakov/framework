@@ -23,6 +23,6 @@
   },
   "scripts": {
     "serve": "php -S localhost:8080 -t public",
-    "test": "phpunit --colors"
+    "test": "phpunit"
   }
 }

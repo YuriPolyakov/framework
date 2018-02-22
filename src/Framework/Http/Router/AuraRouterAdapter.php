@@ -66,6 +66,8 @@ class AuraRouterAdapter implements Router
         $route->name($data->name);
         $route->path($data->path);
         $route->handler($data->handler);
+
+
         foreach ($data->options as $name => $value) {
             switch ($name) {
                 case 'tokens':

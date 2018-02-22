@@ -14,15 +14,28 @@ use Zend\Diactoros\ServerRequest;
 
 class ApplicationTest extends TestCase
 {
+    /**
+     * @var MiddlewareResolver
+     */
+    private $resolver;
+    /**
+     * @var Router
+     */
+    private $router;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->resolver = new MiddlewareResolver(new DummyContainer());
+        $this->router   = $this->createMock(Router::class);
+    }
+
     public function testPipe()
     {
-        $app = new Application(new MiddlewareResolver(), new DefaultHandler(), new Response());
-
+        $app = new Application($this->resolver, $this->router, new DefaultHandler(), new Response());
         $app->pipe(new Middleware1());
         $app->pipe(new Middleware2());
-
         $response = $app->run(new ServerRequest(), new Response());
-
         $this->assertJsonStringEqualsJsonString(
             json_encode(['middleware-1' => 1, 'middleware-2' => 2]),
             $response->getBody()->getContents()
