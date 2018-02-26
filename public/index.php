@@ -15,8 +15,6 @@ chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
 $container = require 'config/container.php';
-
-/** @var Application $app */
 $app = $container->get(Application::class);
 
 require 'config/pipeline.php';
