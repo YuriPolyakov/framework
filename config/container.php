@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Присваивание массива параметров приложения в контейнер с ключом config
+ */
+
 use Framework\Container\Container;
 
 $container = new Container();

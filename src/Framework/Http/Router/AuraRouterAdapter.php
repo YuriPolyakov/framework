@@ -53,7 +53,7 @@ class AuraRouterAdapter implements Router
     }
 
     /**
-     * Создание произвольного роута
+     * Создание произвольного роута с дополнительными параметрами
      *
      * @param RouteData $data
      *
@@ -66,7 +66,6 @@ class AuraRouterAdapter implements Router
         $route->name($data->name);
         $route->path($data->path);
         $route->handler($data->handler);
-
 
         foreach ($data->options as $name => $value) {
             switch ($name) {

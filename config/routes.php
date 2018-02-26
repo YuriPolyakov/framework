@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Список маршрутов
+ */
+
 use App\Http\Action\Blog\IndexAction;
 use App\Http\Action\Blog\ShowAction;
 use App\Http\Action\CabinetAction;

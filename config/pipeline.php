@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Список посредников
+ */
+
 use App\Http\Middleware\BasicAuthMiddleware;
 use App\Http\Middleware\CredentialsMiddleware;
 use App\Http\Middleware\ErrorHandlerMiddleware;

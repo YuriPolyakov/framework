@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Подключение всех объектов с настройками.
+ */
+
 use App\Http\Middleware\BasicAuthMiddleware;
 use App\Http\Middleware\ErrorHandlerMiddleware;
 use App\Http\Middleware\NotFoundHadler;
