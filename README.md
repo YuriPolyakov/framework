@@ -10,6 +10,7 @@ Use
 - PSR-15 HTTP Server Middleware
 - Zend-stratigility Stratigility started as a port of Sencha Connect to PHP. It allows you to build applications out of middleware.
 - Phpunit
+- PSR-11 Container interface
 
 Usage
 ------------
